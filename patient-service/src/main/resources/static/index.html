@@ -32,10 +32,22 @@
         tr:hover {
             background-color: #f1f1f1;
         }
-        #error {
-            color: red;
+        #formError, #success {
             margin-top: 10px;
+            padding: 10px;
             display: none;
+        }
+        #formError {
+            color: red;
+            border: 1px solid red;
+        }
+        #formError ul {
+            margin: 5px 0 0 0;
+            padding-left: 20px;
+        }
+        #success {
+            color: green;
+            border: 1px solid green;
         }
         button {
             padding: 10px 20px;
@@ -44,16 +56,43 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-bottom: 20px;
+            margin: 5px;
         }
         button:hover {
             background-color: #0056b3;
+        }
+        #formContainer {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        #formContainer input {
+            padding: 8px;
+            margin: 5px 0;
+            width: 200px;
+        }
+        #formContainer button {
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 <h1>Patient Management System</h1>
 <button onclick="fetchPatients()">Fetch Patients</button>
+<button onclick="toggleForm('create')">Add New Patient</button>
+<div id="formContainer">
+    <h3 id="formTitle">Add New Patient</h3>
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="text" id="address" placeholder="Address" required>
+    <input type="date" id="dateOfBirth" required>
+    <input type="date" id="registeredDate" required>
+    <div id="formError"></div> <!-- Moved error div here -->
+    <button onclick="submitForm()">Submit</button>
+    <button onclick="toggleForm()">Cancel</button>
+</div>
 <table id="patientTable">
     <thead>
     <tr>
@@ -62,46 +101,42 @@
         <th>Email</th>
         <th>Address</th>
         <th>Date of Birth</th>
+        <th>Actions</th>
     </tr>
     </thead>
-    <tbody id="patientTableBody">
-    <!-- Patient data will be populated here -->
-    </tbody>
+    <tbody id="patientTableBody"></tbody>
 </table>
-<div id="error"></div>
+<div id="success"></div>
 
 <script>
+    const apiBaseUrl = '/patients'; // Relative path for local and Railway
+
     async function fetchPatients() {
         const tableBody = document.getElementById('patientTableBody');
-        const errorDiv = document.getElementById('error');
+        const successDiv = document.getElementById('success');
+        successDiv.style.display = 'none';
 
-        // Clear previous data
         tableBody.innerHTML = '';
-        errorDiv.style.display = 'none';
-        errorDiv.innerHTML = '';
 
         try {
-            // Fetch from the relative /patients endpoint
-            const response = await fetch('/patients', {
+            const response = await fetch(apiBaseUrl, {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                const errorData = await response.json();
+                throw new Error(formatErrorMessage(errorData));
             }
 
             const patients = await response.json();
 
             if (patients.length === 0) {
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = 'No patients found.';
+                successDiv.style.display = 'block';
+                successDiv.innerHTML = 'No patients found.';
                 return;
             }
 
-            // Populate the table with patient data
             patients.forEach(patient => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -110,15 +145,114 @@
                         <td>${patient.email}</td>
                         <td>${patient.address}</td>
                         <td>${patient.dateOfBirth}</td>
+                        <td>
+                            <button onclick="deletePatient('${patient.id}')">Delete</button>
+                        </td>
                     `;
                 tableBody.appendChild(row);
             });
         } catch (error) {
             console.error('Error fetching patients:', error);
-            errorDiv.style.display = 'block';
-            errorDiv.innerHTML = `Failed to fetch patients: ${error.message}`;
+            successDiv.style.display = 'block';
+            successDiv.innerHTML = `Failed to fetch patients: ${error.message}`;
         }
     }
+
+    function toggleForm(action = 'create') {
+        const formContainer = document.getElementById('formContainer');
+        const formErrorDiv = document.getElementById('formError');
+        formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+        formErrorDiv.style.display = 'none'; // Reset error display when toggling form
+        if (action === 'create') {
+            document.getElementById('formTitle').innerHTML = 'Add New Patient';
+            clearForm();
+        }
+    }
+
+    function clearForm() {
+        document.getElementById('name').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('address').value = '';
+        document.getElementById('dateOfBirth').value = '';
+        document.getElementById('registeredDate').value = '';
+    }
+
+    function formatErrorMessage(errorData) {
+        if (typeof errorData === 'object' && errorData !== null) {
+            const errors = Object.entries(errorData)
+                .map(([field, message]) => `<li>${field}: ${message}</li>`)
+                .join('');
+            return `<ul>${errors}</ul>`;
+        }
+        return 'Unknown error occurred';
+    }
+
+    async function submitForm() {
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const address = document.getElementById('address').value;
+        const dateOfBirth = document.getElementById('dateOfBirth').value;
+        const registeredDate = document.getElementById('registeredDate').value;
+
+        const payload = { name, email, address, dateOfBirth, registeredDate };
+
+        const formErrorDiv = document.getElementById('formError');
+        const successDiv = document.getElementById('success');
+        formErrorDiv.style.display = 'none';
+        successDiv.style.display = 'none';
+
+        try {
+            const response = await fetch(apiBaseUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(formatErrorMessage(errorData));
+            }
+
+            successDiv.style.display = 'block';
+            successDiv.innerHTML = 'Patient created successfully!';
+            toggleForm();
+            fetchPatients(); // Refresh the table
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            formErrorDiv.style.display = 'block';
+            formErrorDiv.innerHTML = `Failed to create patient: ${error.message}`;
+        }
+    }
+
+    async function deletePatient(id) {
+        if (confirm(`Are you sure you want to delete patient with ID ${id}?`)) {
+            const successDiv = document.getElementById('success');
+            successDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(formatErrorMessage(errorData));
+                }
+
+                successDiv.style.display = 'block';
+                successDiv.innerHTML = 'Patient deleted successfully!';
+                fetchPatients(); // Refresh the table
+            } catch (error) {
+                console.error('Error deleting patient:', error);
+                successDiv.style.display = 'block';
+                successDiv.innerHTML = `Failed to delete patient: ${error.message}`;
+            }
+        }
+    }
+
+    // Load patients on page load
+    window.onload = fetchPatients;
 </script>
 </body>
 </html>
