@@ -2,6 +2,17 @@
 builder = "dockerfile" # Use the Dockerfile in patient-service/
 context = "patient-service" # Build context is the patient-service directory
 
+
+[[services]]
+service = "patient-service-db"
+image = "postgres:latest"
+ports = ["5432:5432"]
+env = [
+  "POSTGRES_USER=admin_user",
+  "POSTGRES_PASSWORD=password",
+  "POSTGRES_DB=db"
+]
+
 [[services]]
 service = "patient-service"
 buildCommand = "cd patient-service && docker build -t patient-service:latest ."
@@ -13,14 +24,4 @@ env = [
   "SPRING_DATASOURCE_USERNAME=admin_user",
   "SPRING_JPA_HIBERNATE_DDL_AUTO=update",
   "SPRING_SQL_INIT_MODE=always"
-]
-
-[[services]]
-service = "patient-service-db"
-image = "postgres:latest"
-ports = ["5432:5432"]
-env = [
-  "POSTGRES_USER=admin_user",
-  "POSTGRES_PASSWORD=password",
-  "POSTGRES_DB=db"
 ]
