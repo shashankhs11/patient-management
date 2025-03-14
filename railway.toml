@@ -1,13 +1,26 @@
 [build]
-builder = "nixpacks" # Use Nixpacks for the Spring Boot app, or "dockerfile" if preferred
+builder = "dockerfile" # Use the Dockerfile in patient-service/
+context = "patient-service" # Build context is the patient-service directory
 
 [[services]]
 service = "patient-service"
-buildCommand = "cd patient-service && mvn clean package"
-startCommand = "java -jar patient-service/target/patient-service-0.0.1-SNAPSHOT.jar"
+buildCommand = "cd patient-service && docker build -t patient-service:latest ."
+startCommand = "java -jar target/patient-service-0.0.1-SNAPSHOT.jar"
 ports = ["4000:4000"]
+env = [
+  "SPRING_DATASOURCE_PASSWORD=password",
+  "SPRING_DATASOURCE_URL=jdbc:postgresql://patient-service-db:5432/db",
+  "SPRING_DATASOURCE_USERNAME=admin_user",
+  "SPRING_JPA_HIBERNATE_DDL_AUTO=update",
+  "SPRING_SQL_INIT_MODE=always"
+]
 
 [[services]]
 service = "patient-service-db"
 image = "postgres:latest"
 ports = ["5432:5432"]
+env = [
+  "POSTGRES_USER=admin_user",
+  "POSTGRES_PASSWORD=password",
+  "POSTGRES_DB=db"
+]
