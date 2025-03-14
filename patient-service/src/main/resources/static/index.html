@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        #error {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<h1>Patient Management System</h1>
+<button onclick="fetchPatients()">Fetch Patients</button>
+<table id="patientTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Address</th>
+        <th>Date of Birth</th>
+    </tr>
+    </thead>
+    <tbody id="patientTableBody">
+    <!-- Patient data will be populated here -->
+    </tbody>
+</table>
+<div id="error"></div>
+
+<script>
+    async function fetchPatients() {
+        const tableBody = document.getElementById('patientTableBody');
+        const errorDiv = document.getElementById('error');
+
+        // Clear previous data
+        tableBody.innerHTML = '';
+        errorDiv.style.display = 'none';
+        errorDiv.innerHTML = '';
+
+        try {
+            // Fetch from the relative /patients endpoint
+            const response = await fetch('/patients', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const patients = await response.json();
+
+            if (patients.length === 0) {
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = 'No patients found.';
+                return;
+            }
+
+            // Populate the table with patient data
+            patients.forEach(patient => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                        <td>${patient.id}</td>
+                        <td>${patient.name}</td>
+                        <td>${patient.email}</td>
+                        <td>${patient.address}</td>
+                        <td>${patient.dateOfBirth}</td>
+                    `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error fetching patients:', error);
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = `Failed to fetch patients: ${error.message}`;
+        }
+    }
+</script>
+</body>
+</html>
