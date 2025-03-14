@@ -1,3 +1,0 @@
-[build]
-builder = "dockerfile" # Use the Dockerfile in patient-service/
-context = "patient-service" # Build context is the patient-service directory
