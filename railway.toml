@@ -1,0 +1,13 @@
+[build]
+builder = "nixpacks" # Use Nixpacks for the Spring Boot app, or "dockerfile" if preferred
+
+[[services]]
+service = "patient-service"
+buildCommand = "cd patient-service && mvn clean package"
+startCommand = "java -jar patient-service/target/patient-service-0.0.1-SNAPSHOT.jar"
+ports = ["4000:4000"]
+
+[[services]]
+service = "patient-service-db"
+image = "postgres:latest"
+ports = ["5432:5432"]
