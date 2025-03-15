@@ -1,0 +1,24 @@
+// This file is just a blueprint. WE still need to generate these. Can use maven (called stubs)
+
+syntax = "proto3"; // describes the version of our proto
+
+option java_multiple_files = true; //split our service request and response files into different files
+
+option java_package = "billing"; //puts all our code into a package called "billing"
+
+// defining our service
+service BillingService {
+  rpc CreateBillingAccount (BillingRequest) returns (BillingResponse);
+}
+
+//message - used to describe our object.. SImiliar to our dtos
+message BillingRequest {
+  string patientId = 1; // 1,2,3 helps in serialiazation - has to be unique. Basically just the order
+  string name = 2;
+  string email = 3;
+}
+
+message BillingResponse {
+  string accountId = 1;
+  string status = 2;
+}
