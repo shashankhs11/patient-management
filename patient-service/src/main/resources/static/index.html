@@ -82,6 +82,7 @@
 <h1>Patient Management System</h1>
 <button onclick="fetchPatients()">Fetch Patients</button>
 <button onclick="toggleForm('create')">Add New Patient</button>
+<button onclick="openSwaggerUI()">API Documentation</button>
 <div id="formContainer">
     <h3 id="formTitle">Add New Patient</h3>
     <input type="text" id="name" placeholder="Name" required>
@@ -251,6 +252,9 @@
         }
     }
 
+    async function openSwaggerUI() {
+        window.open('/swagger-ui.html', '_blank');
+    }
     // Load patients on page load
     window.onload = fetchPatients;
 </script>
