@@ -3,6 +3,7 @@ package com.pm.patientservice.grpc;
 import billing.BillingRequest;
 import billing.BillingResponse;
 import billing.BillingServiceGrpc;
+import billing.BillingServiceGrpc.BillingServiceBlockingStub;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.slf4j.Logger;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class BillingServiceGrpcClient {
 
     private static final Logger log = LoggerFactory.getLogger(BillingServiceGrpcClient.class);
-    private final BillingServiceGrpc.BillingServiceBlockingStub blockingStub;
+    private final BillingServiceBlockingStub blockingStub;
     //Synchronous client call - blockingstub waits for response from BillingService before continuing (Similar to
     // REST but just grpc)
 
