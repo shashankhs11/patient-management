@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_multiple_files = true; // we want seperate files instead of all the classes in one file
+package patient.events;
+
+message PatientEvent {
+  string patientId = 1;
+  string name = 2;
+  string email = 3;
+  string event_type = 4;
+}
+
