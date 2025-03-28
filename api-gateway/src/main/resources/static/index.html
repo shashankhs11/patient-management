@@ -110,7 +110,7 @@
 <div id="success"></div>
 
 <script>
-    const apiBaseUrl = '/patients'; // Relative path for local and Railway
+    const apiBaseUrl = '/api/patients'; // Relative path for local and Railway
 
     async function fetchPatients() {
         const tableBody = document.getElementById('patientTableBody');
@@ -253,7 +253,7 @@
     }
 
     async function openSwaggerUI() {
-        window.open('/swagger-ui.html', '_blank');
+        window.open('/swagger-ui.html?url=/api-docs/patients', '_blank');
     }
     // Load patients on page load
     window.onload = fetchPatients;
