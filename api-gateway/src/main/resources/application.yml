@@ -26,5 +26,6 @@ spring:
             - Path=/swagger-ui/**, /swagger-ui.html
           filters:
             - RewritePath=/swagger-ui(/?)(.*), /swagger-ui$1$2
-
+  main:
+    web-application-type: reactive
 
