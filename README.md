@@ -56,7 +56,7 @@ patient-management/
 - Persistent data storage with PostgreSQL and schema initialization via SQL scripts
 - Containerized services with Dockerfiles per service for easy deployment
 - Local orchestration using Docker Compose
-- Designed for deployment on cloud VMs (e.g., Oracle Cloud free tier ARM instance)
+- Designed for deployment on cloud
 
 ---
 
@@ -81,7 +81,7 @@ docker compose up --build
 
 ## Deployment
 
-- Services can be deployed on cloud virtual machines.
+- Services can be deployed.
 - Expose API Gateway port `4004` to public internet to enable frontend connectivity.
 - Use Docker Compose on the VM for running all containers together.
 - CI/CD pipelines (e.g., GitHub Actions) can be configured for automated deployment.
