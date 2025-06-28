@@ -3,15 +3,18 @@ name: Deploy to Oracle VM
 on:
   push:
     branches:
-      - deploy  # Trigger on deploy branch
+      - deploy
 
 jobs:
   deploy:
+    name: Deploy to Oracle VM
     runs-on: ubuntu-latest
+    environment:
+      name: production
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.1
